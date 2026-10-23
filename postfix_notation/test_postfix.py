@@ -42,7 +42,9 @@ def test_clean_keeps_int():
 
 # parse_number: превращение токена в число
 
-# прогон теста по списку разных корректных чисел
+# прогон теста по списку разных корректных чисел 
+# декоратор нужен для того, чтобы не писать 10 одинаковых тестов для разных чисел
+# список входных данных (token) и ожидаемых ответов (expected)
 @pytest.mark.parametrize("token, expected", [
     ("5", 5),
     ("-3", -3),
@@ -50,7 +52,7 @@ def test_clean_keeps_int():
     ("2.5", 2.5),
     ("2.0", 2),
 ])
-# целые и дробные числа, отрицательные, распознаются
+# целые, дробные и отрицательные числа, распознаются
 def test_parse_number_valid(token, expected):
     # действие
     value = parse_number(token)
@@ -142,13 +144,22 @@ def test_calculate_expressions(expression, expected):
     assert result == expected
 
 
-# после каждого токена печатается состояние стека
+# после каждого токена печатается состояние стека 
+# capsys: встроенный инструмент pytest
+# Если передать его в аргументы теста, 
+# он начинает втайне «записывать» всё, 
+# что программа пытается вывести на экран через print()
+
 def test_calculate_prints_stack_on_every_step(capsys):
     # подготовка
     tokens = ["3", "0", "4", "~", "2", "~"]
     # действие 
     calculate(tokens)
     # проверка: сверка построчно вывод в консоль
+
+    # capsys.readouterr().out отдает весь перехваченный текст, 
+    # мы разбиваем его по строкам (splitlines()) и сверяем с тем, 
+    # что ожидаем увидеть
     assert capsys.readouterr().out.splitlines() == [
         "шаг 1: 3 в стеке [3]",
         "шаг 2: 0 в стеке [3, 0]",
@@ -288,14 +299,23 @@ def test_main_reads_sys_argv_by_default(capsys, monkeypatch):
     code = main()
     # проверка
     assert code == 0
+
+    # capsys перехватывает всё, что программа печатала через print()
+    # берем весь вывод (.out), разбиваем на строки, 
+    # смотрим что строка последняя содердит ответ правильный
     assert capsys.readouterr().out.splitlines()[-1] == "2 3 + = 5"
 
 
-# запуск файла как программызавершается с кодом 0
+# запуск файла(main.py) как программы завершается с кодом 0 
+
+# для того чтобы убедиться что блок if __name__ == "__main__": 
+# работает корректно  
 def test_script_run_as_program(capsys, monkeypatch):
     # подготовка
     monkeypatch.setattr(sys, "argv", ["main.py", "3 0 4 ~ 2 ~"])
     # действие и проверка: запускаем скрипт через runpy и ловим sys.exit
+
+    # ловим попытку заавершения и записываем ее в переменную exit_info
     with pytest.raises(SystemExit) as exit_info:
         runpy.run_path(str(MAIN_PATH), run_name="__main__")
     assert exit_info.value.code == 0
