@@ -1,0 +1,7 @@
+s1 = ""
+s2 = "def while # not a comment; ( )"
+pi = 3.1415
+half = .5
+ten = 10.
+# dcoindoivcnaodncvosdlfkvmk
+result = s2 # wcjiadpjc 
