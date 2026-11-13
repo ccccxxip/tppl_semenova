@@ -3,3 +3,6 @@ postfix_notation/__pycache__
 postfix_notation/.pytest_cache
 .coverage
 venv
+tokenizer/__pycache__
+tokenizer/tests/__pycache__
+tokenizer/.coverage
